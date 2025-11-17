@@ -4,6 +4,7 @@
 #include "ExternalInput.h"
 
 #define EXT_BUTTON 2
+#define GRIP_SENSOR 3
 #define BASE_Z_MOTOR 15
 #define BASE_Y_MOTOR 14
 #define ELBOW_Y_MOTOR 13
@@ -72,13 +73,20 @@ void handleButtonPress()
 }
 
 
+void gripperClosed()
+{
+  Serial.println("Gripped");
+}
+
 void setup() {
   display.init();
 
   Serial.begin(115200);  
 
   pinMode(EXT_BUTTON, INPUT);  
+  pinMode(GRIP_SENSOR, INPUT);
   attachInterrupt(digitalPinToInterrupt(EXT_BUTTON), handleButtonPress, RISING);
+  attachInterrupt(digitalPinToInterrupt(GRIP_SENSOR), gripperClosed, RISING);
 
   motorControls.setUp(initialAngles);
 }
@@ -133,8 +141,9 @@ void handleArmAngles()
 
 TransmitStates transmissionType;
 void loop() {
-
-    if (readVectorFromSerial(transmissionType))
+  return;
+  
+  if (readVectorFromSerial(transmissionType))
     {
       handleArmAngles();
    
@@ -161,11 +170,11 @@ void loop() {
       }
       else if (transmissionType == TransmitStates::GripperClose)
       { 
-        Serial.println(TransmitStates::GripperCloseComplete);
+        Serial.println(TransmitStates::GripperCloseComplete);        
       }
-      else if (transmissionType == TransmitStates::GripperGrasp)
-      { 
-        Serial.println(TransmitStates::GripperGraspComplete);
-      }
+      // else if (transmissionType == TransmitStates::GripperGrasp)
+      // { 
+      //   Serial.println(TransmitStates::GripperGraspComplete);
+      // }
     }
 }
