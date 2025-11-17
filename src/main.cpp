@@ -11,16 +11,6 @@
 #define WRIST_Y_MOTOR 10
 #define GRIPPER_MOTOR 9
 
-Adafruit_PWMServoDriver pwm_servo = Adafruit_PWMServoDriver(0x40);
-
-FullJointAngles initialAngles = {90, 27, 27, 132, 90};
-MotorControls motorControls(&pwm_servo, BASE_Z_MOTOR, BASE_Y_MOTOR, ELBOW_Y_MOTOR, WRIST_Y_MOTOR, GRIPPER_MOTOR);
-ExternalInput extInput;
-DisplayControl display(0x27, 16, 2);
-
-bool awake = false;
-bool armMoving = false;
-
 enum TransmitStates : uint8_t
 {
     Awaken = 11,
@@ -43,6 +33,18 @@ enum TransmitStates : uint8_t
     GripperGrasp = 25,
     GripperGraspComplete = 26
 };
+
+Adafruit_PWMServoDriver pwm_servo = Adafruit_PWMServoDriver(0x40);
+
+FullJointAngles initialAngles = {90, 27, 27, 132, 90};
+MotorControls motorControls(&pwm_servo, BASE_Z_MOTOR, BASE_Y_MOTOR, ELBOW_Y_MOTOR, WRIST_Y_MOTOR, GRIPPER_MOTOR);
+ExternalInput extInput;
+DisplayControl display(0x27, 16, 2);
+TransmitStates transmissionType;
+
+bool awake = false;
+bool armMoving = false;
+
 
 volatile unsigned long lastDebounceTime = 0;
 const unsigned long debounceDelay = 1000;
@@ -75,7 +77,10 @@ void handleButtonPress()
 
 void gripperClosed()
 {
-  Serial.println("Gripped");
+  if (transmissionType == TransmitStates::GripperGrasp)
+  {
+     Serial.println(TransmitStates::GripperGraspComplete);
+  } 
 }
 
 void setup() {
@@ -139,7 +144,6 @@ void handleArmAngles()
   motorControls.setEntireArmAngles(currAngles);    
 }
 
-TransmitStates transmissionType;
 void loop() {
   return;
   
