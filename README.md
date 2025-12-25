@@ -3,7 +3,7 @@
 The Arduino controller code for the moveit2 controlled robotic arm I made.
 
 ## Link to the main Arm code:
-https://github.com/Alexledev/ComputerViz
+https://github.com/Alexledev/RoboArmMk2
 
 ## Installation
 1. Install PlatformIO on VSCode.
