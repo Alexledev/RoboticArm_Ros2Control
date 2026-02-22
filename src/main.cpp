@@ -9,6 +9,7 @@
 #define BASE_Y_MOTOR 14
 #define ELBOW_Y_MOTOR 13
 #define WRIST_Y_MOTOR 10
+#define WRIST_X_MOTOR 11
 #define GRIPPER_MOTOR 9
 
 enum TransmitStates : uint8_t
@@ -36,10 +37,10 @@ enum TransmitStates : uint8_t
 
 Adafruit_PWMServoDriver pwm_servo = Adafruit_PWMServoDriver(0x40);
 
-FullJointAngles initialAngles = {90, 27, 27, 132, 90};
-MotorControls motorControls(&pwm_servo, BASE_Z_MOTOR, BASE_Y_MOTOR, ELBOW_Y_MOTOR, WRIST_Y_MOTOR, GRIPPER_MOTOR);
+FullJointAngles initialAngles = {90, 15, 30, 125, 90, 90}; //138  27
+MotorControls motorControls(&pwm_servo, BASE_Z_MOTOR, BASE_Y_MOTOR, ELBOW_Y_MOTOR, WRIST_Y_MOTOR, WRIST_X_MOTOR, GRIPPER_MOTOR);
 ExternalInput extInput;
-DisplayControl display(0x27, 16, 2);
+// DisplayControl display(0x27, 16, 2);
 TransmitStates transmissionType;
 
 bool awake = false;
@@ -77,14 +78,14 @@ void handleButtonPress()
 
 void gripperClosed()
 {
-  if (transmissionType == TransmitStates::GripperGrasp)
-  {
-     Serial.println(TransmitStates::GripperGraspComplete);
-  } 
+  // if (transmissionType == TransmitStates::GripperGrasp)
+  // {
+  Serial.println(TransmitStates::GripperGraspComplete);
+  // } 
 }
 
 void setup() {
-  display.init();
+  // display.init();
 
   Serial.begin(115200);  
 
@@ -105,8 +106,18 @@ static float radToDeg(float radians)
     return radians*180.0f/M_PI;
 }
 
-const int VECTOR_SIZE = 6;
+const int VECTOR_SIZE = 7;
 float vec[VECTOR_SIZE];   // match float size = 4 bytes
+
+// void displayInfo()
+// {
+//   String disp = String(static_cast<int>(vec[0])) + "|" + String(vec[1]) + "|" + String(vec[2]);
+//   display.displayLine(0, disp, true);
+
+//   String disp2 = String(vec[3]) + "|" + String(vec[4])+ "|" + String(vec[5]);
+//   display.displayLine(1, disp2, false);
+  
+// }
 
 bool readVectorFromSerial(TransmitStates& transmit) {
 
@@ -123,6 +134,7 @@ bool readVectorFromSerial(TransmitStates& transmit) {
     received = 0;
 
     transmit = static_cast<TransmitStates>( static_cast<int>(vec[0]) );
+    // displayInfo();
     return true;
   }
 
@@ -145,40 +157,35 @@ void handleArmAngles()
 }
 
 void loop() {
-  return;
-  
-  if (readVectorFromSerial(transmissionType))
-    {
-      handleArmAngles();
-   
-      String disp = String(static_cast<int>(vec[0])) + "|" + String(vec[1]) + "|" + String(vec[2]);
-      String disp2 = String(vec[3]) + "|" + String(vec[4])+ "|" + String(vec[5]);
-      display.displayLine(0, disp, true);
-      display.displayLine(1, disp2, false);
+ 
+  if (!readVectorFromSerial(transmissionType))
+    return;
+    
+  handleArmAngles();
 
-      if (transmissionType == TransmitStates::ArmMovingEnd)
-      {
-        Serial.println(TransmitStates::ArmMovingComplete);
-      }
-      else if (transmissionType == TransmitStates::Awaken)
-      {
-        Serial.println(TransmitStates::AwakenComplete);
-      }
-      else if (transmissionType == TransmitStates::Rest)
-      {
-        Serial.println(TransmitStates::RestComplete);
-      }
-      else if (transmissionType == TransmitStates::GripperOpen)
-      { 
-        Serial.println(TransmitStates::GripperOpenComplete);
-      }
-      else if (transmissionType == TransmitStates::GripperClose)
-      { 
-        Serial.println(TransmitStates::GripperCloseComplete);        
-      }
-      // else if (transmissionType == TransmitStates::GripperGrasp)
-      // { 
-      //   Serial.println(TransmitStates::GripperGraspComplete);
-      // }
-    }
+  if (transmissionType == TransmitStates::ArmMovingEnd)
+  {
+    Serial.println(TransmitStates::ArmMovingComplete);
+  }
+  else if (transmissionType == TransmitStates::Awaken)
+  {
+    Serial.println(TransmitStates::AwakenComplete);
+  }
+  else if (transmissionType == TransmitStates::Rest)
+  {
+    Serial.println(TransmitStates::RestComplete);
+  }
+  else if (transmissionType == TransmitStates::GripperOpen)
+  { 
+    Serial.println(TransmitStates::GripperOpenComplete);
+  }
+  else if (transmissionType == TransmitStates::GripperClose)
+  { 
+    Serial.println(TransmitStates::GripperCloseComplete);        
+  }
+  // else if (transmissionType == TransmitStates::GripperGrasp)
+  // { 
+  //   Serial.println(TransmitStates::GripperGraspComplete);
+  // }
+    
 }

@@ -49,10 +49,16 @@ void MotorControls::setEntireArmAngles(const FullJointAngles angles)
         setSingleJointDeg(angles.j4_wrist_angle, wristYMotor);
         delayWith(angles.j4_wrist_angle, _jwTheta);
     }
+
+    if (angles.j5_wristX_angle > 10 && angles.j5_wristX_angle < 170)
+    {
+        setSingleJointDeg(angles.j5_wristX_angle, wristXMotor);
+        delayWith(angles.j5_wristX_angle, _jwxTheta);
+    }
     
-    if (angles.j5_gripper_angle > 10 && angles.j5_gripper_angle <= 90)
+    if (angles.j6_gripper_angle > 10 && angles.j6_gripper_angle <= 90)
     { 
-        setSingleJointDeg(angles.j5_gripper_angle, gripperMotor);
+        setSingleJointDeg(angles.j6_gripper_angle, gripperMotor);
     }
 
     currentRefAngles = angles;

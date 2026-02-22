@@ -1,5 +1,26 @@
 {
     "files.associations": {
         "new": "cpp"
-    }
+    },
+    "ROS2.distro": "jazzy",
+    "python.autoComplete.extraPaths": [
+        "/home/jetsonalex/Roverlad_ROS2/install/viz_interfaces/lib/python3.12/site-packages",
+        "/home/jetsonalex/Roverlad_ROS2/install/ble_reader_py/lib/python3.12/site-packages",
+        "/home/jetsonalex/Roverlad_ROS2/install/roverlad_interfaces/lib/python3.12/site-packages",
+        "/home/jetsonalex/ComputerViz/install/yolo_cv/lib/python3.12/site-packages",
+        "/home/jetsonalex/ComputerViz/install/cv_interfaces/lib/python3.12/site-packages",
+        "/home/jetsonalex/RoboArmMk2/install/grasping_msgs/lib/python3.12/site-packages",
+        "/home/jetsonalex/RoboArmMk2/install/armkidd_interfaces/lib/python3.12/site-packages",
+        "/opt/ros/jazzy/lib/python3.12/site-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/jetsonalex/Roverlad_ROS2/install/viz_interfaces/lib/python3.12/site-packages",
+        "/home/jetsonalex/Roverlad_ROS2/install/ble_reader_py/lib/python3.12/site-packages",
+        "/home/jetsonalex/Roverlad_ROS2/install/roverlad_interfaces/lib/python3.12/site-packages",
+        "/home/jetsonalex/ComputerViz/install/yolo_cv/lib/python3.12/site-packages",
+        "/home/jetsonalex/ComputerViz/install/cv_interfaces/lib/python3.12/site-packages",
+        "/home/jetsonalex/RoboArmMk2/install/grasping_msgs/lib/python3.12/site-packages",
+        "/home/jetsonalex/RoboArmMk2/install/armkidd_interfaces/lib/python3.12/site-packages",
+        "/opt/ros/jazzy/lib/python3.12/site-packages"
+    ]
 }

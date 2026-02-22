@@ -21,9 +21,10 @@ struct FullJointAngles
       int16_t j2_shoulder_angle;
       int16_t j3_elbow_angle;
       int16_t j4_wrist_angle;
-      int16_t j5_gripper_angle;
+      int16_t j5_wristX_angle;
+      int16_t j6_gripper_angle;
     };
-    int16_t joints[5];  // access by index
+    int16_t joints[6];  // access by index
   };
 };
 
@@ -37,6 +38,7 @@ private:
   const int8_t baseYMotor = 14;
   const int8_t elbowYMotor = 13;
   const int8_t wristYMotor = 10;
+  const int8_t wristXMotor = 11;
   const int8_t gripperMotor = 9;
 
   // const int8_t closedClawAngle = 90;
@@ -48,22 +50,14 @@ private:
   float _j1Theta = 0.0f;
   float _j2Theta = 0.0f;
   float _jwTheta = 0.0f;
+  float _jwxTheta = 0.0f;
 public:
 
   MotorControls(
-      Adafruit_PWMServoDriver *servo,
-      int8_t baseZPin,
-      int8_t baseYPin,
-      int8_t elbowYPin,
-      int8_t wristYPin,
-      int8_t gripperPin)
-      : pwm(servo),
-        baseZMotor(baseZPin),
-        baseYMotor(baseYPin),
-        elbowYMotor(elbowYPin),
-        wristYMotor(wristYPin),
-        gripperMotor(gripperPin)
+      Adafruit_PWMServoDriver *servo, int8_t baseZPin, int8_t baseYPin, int8_t elbowYPin, int8_t wristYPin, int8_t wristXPin, int8_t gripperPin)
+         : pwm(servo), baseZMotor(baseZPin), baseYMotor(baseYPin), elbowYMotor(elbowYPin), wristYMotor(wristYPin), wristXMotor(wristXPin), gripperMotor(gripperPin)
   {
+
   }
 
   void setSingleJointDeg(int deg, int8_t pin);
