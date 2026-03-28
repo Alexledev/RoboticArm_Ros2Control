@@ -40,9 +40,6 @@ private:
   const int8_t wristYMotor = 10;
   const int8_t wristXMotor = 11;
   const int8_t gripperMotor = 9;
-
-  // const int8_t closedClawAngle = 90;
-  // const int8_t fullOpenClawAngle = 40;
   FullJointAngles currentRefAngles; 
 
   const float delayFactor = 2.4f;
@@ -51,17 +48,20 @@ private:
   float _j2Theta = 0.0f;
   float _jwTheta = 0.0f;
   float _jwxTheta = 0.0f;
+
 public:
 
-  MotorControls(
-      Adafruit_PWMServoDriver *servo, int8_t baseZPin, int8_t baseYPin, int8_t elbowYPin, int8_t wristYPin, int8_t wristXPin, int8_t gripperPin)
-         : pwm(servo), baseZMotor(baseZPin), baseYMotor(baseYPin), elbowYMotor(elbowYPin), wristYMotor(wristYPin), wristXMotor(wristXPin), gripperMotor(gripperPin)
+  bool ready = false;
+
+  MotorControls(Adafruit_PWMServoDriver *servo, int8_t baseZPin, int8_t baseYPin, int8_t elbowYPin, int8_t wristYPin, int8_t wristXPin, int8_t gripperPin) : 
+    pwm(servo), baseZMotor(baseZPin), baseYMotor(baseYPin), elbowYMotor(elbowYPin), wristYMotor(wristYPin), wristXMotor(wristXPin), gripperMotor(gripperPin)
   {
 
   }
 
   void setSingleJointDeg(int deg, int8_t pin);
   void setUp(const FullJointAngles initialAngles);
+  void initialiseReady();
   void setEntireArmAngles(const FullJointAngles angles);
 
   FullJointAngles getEntireArmAngles()

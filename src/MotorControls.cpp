@@ -18,9 +18,14 @@ void MotorControls::setSingleJointDeg(int deg, int8_t pin)
 
 void MotorControls::setUp(const FullJointAngles initialAngles)
 {
+    ready = true;
+    setEntireArmAngles(initialAngles);
+}
+
+void MotorControls::initialiseReady()
+{
     pwm->begin();
     pwm->setPWMFreq(50); // Set frequency to 50 Hz for servos
-    setEntireArmAngles(initialAngles);
 }
 
 void MotorControls::setEntireArmAngles(const FullJointAngles angles)

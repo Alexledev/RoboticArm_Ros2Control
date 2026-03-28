@@ -1,16 +1,23 @@
 #include <Arduino.h>
-#include "DisplayControl.h"
 #include "MotorControls.h"
-#include "ExternalInput.h"
+// #include "ExternalInput.h"
+
+#define SERIAL_ANGLE_OFFSET 90
+
+#define LED_PIN 13   // onboard LED
 
 #define EXT_BUTTON 2
 #define GRIP_SENSOR 3
+
+#define AWAKE_SENSE 7
+
 #define BASE_Z_MOTOR 15
 #define BASE_Y_MOTOR 14
 #define ELBOW_Y_MOTOR 13
 #define WRIST_Y_MOTOR 10
 #define WRIST_X_MOTOR 11
 #define GRIPPER_MOTOR 9
+
 
 enum TransmitStates : uint8_t
 {
@@ -37,15 +44,12 @@ enum TransmitStates : uint8_t
 
 Adafruit_PWMServoDriver pwm_servo = Adafruit_PWMServoDriver(0x40);
 
-FullJointAngles initialAngles = {90, 15, 30, 125, 90, 90}; //138  27
+FullJointAngles initialAngles = {90, 15, 25, 115, 90, 90}; //138  27
 MotorControls motorControls(&pwm_servo, BASE_Z_MOTOR, BASE_Y_MOTOR, ELBOW_Y_MOTOR, WRIST_Y_MOTOR, WRIST_X_MOTOR, GRIPPER_MOTOR);
-ExternalInput extInput;
-// DisplayControl display(0x27, 16, 2);
 TransmitStates transmissionType;
 
 bool awake = false;
 bool armMoving = false;
-
 
 volatile unsigned long lastDebounceTime = 0;
 const unsigned long debounceDelay = 1000;
@@ -65,36 +69,34 @@ void handleButtonPress()
   {
     Serial.println(TransmitStates::Awaken);  
     awake = true;
-    // display.displayLine(1, "Awaken", false);
   }
   else
   {
     Serial.println(TransmitStates::Rest);
     awake = false;
-    // display.displayLine(1, "Rest  ", false);
   }
 }
 
 
+bool active = false;
+
 void gripperClosed()
 {
-  // if (transmissionType == TransmitStates::GripperGrasp)
-  // {
   Serial.println(TransmitStates::GripperGraspComplete);
-  // } 
 }
 
 void setup() {
-  // display.init();
-
   Serial.begin(115200);  
 
+  pinMode(LED_BUILTIN, OUTPUT);
+
+  pinMode(AWAKE_SENSE, INPUT_PULLUP);
   pinMode(EXT_BUTTON, INPUT);  
   pinMode(GRIP_SENSOR, INPUT);
   attachInterrupt(digitalPinToInterrupt(EXT_BUTTON), handleButtonPress, RISING);
   attachInterrupt(digitalPinToInterrupt(GRIP_SENSOR), gripperClosed, RISING);
 
-  motorControls.setUp(initialAngles);
+  motorControls.initialiseReady();
 }
 
 String inputString = "";
@@ -109,16 +111,6 @@ static float radToDeg(float radians)
 const int VECTOR_SIZE = 7;
 float vec[VECTOR_SIZE];   // match float size = 4 bytes
 
-// void displayInfo()
-// {
-//   String disp = String(static_cast<int>(vec[0])) + "|" + String(vec[1]) + "|" + String(vec[2]);
-//   display.displayLine(0, disp, true);
-
-//   String disp2 = String(vec[3]) + "|" + String(vec[4])+ "|" + String(vec[5]);
-//   display.displayLine(1, disp2, false);
-  
-// }
-
 bool readVectorFromSerial(TransmitStates& transmit) {
 
   const int numBytes = VECTOR_SIZE * sizeof(float);
@@ -126,7 +118,7 @@ bool readVectorFromSerial(TransmitStates& transmit) {
   static int received = 0;
 
   while (received < numBytes) {
-    if (Serial.available() )
+    if (Serial.available())
         ptr[received++] = Serial.read();
   }
 
@@ -134,7 +126,6 @@ bool readVectorFromSerial(TransmitStates& transmit) {
     received = 0;
 
     transmit = static_cast<TransmitStates>( static_cast<int>(vec[0]) );
-    // displayInfo();
     return true;
   }
 
@@ -157,7 +148,32 @@ void handleArmAngles()
 }
 
 void loop() {
- 
+
+  if (active == false || motorControls.ready == false)
+  {
+    // digitalWrite(LED_BUILTIN, false);
+    // return;  
+
+    if (digitalRead(AWAKE_SENSE) == LOW) // Inverted, low => power is on
+    {
+      digitalWrite(LED_BUILTIN, true);
+      active = true;
+    } 
+    else 
+    {
+      active = false;
+
+      if (motorControls.ready == false)
+      {
+          motorControls.setUp(initialAngles);
+
+          return;
+      }
+    }
+
+    return;
+  }
+
   if (!readVectorFromSerial(transmissionType))
     return;
     
@@ -183,9 +199,5 @@ void loop() {
   { 
     Serial.println(TransmitStates::GripperCloseComplete);        
   }
-  // else if (transmissionType == TransmitStates::GripperGrasp)
-  // { 
-  //   Serial.println(TransmitStates::GripperGraspComplete);
-  // }
     
 }
